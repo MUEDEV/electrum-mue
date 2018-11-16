@@ -37,7 +37,7 @@ from .jsonrpc import VerifyingJSONRPCServer
 from .version import ELECTRUM_VERSION
 from .network import Network
 from .util import (json_decode, DaemonThread, print_error, to_string,
-                   create_and_start_event_loop)
+                   create_and_start_event_loop, profiler)
 from .wallet import Wallet, Abstract_Wallet
 from .storage import WalletStorage
 from .commands import known_commands, Commands
@@ -121,6 +121,7 @@ def get_rpc_credentials(config: SimpleConfig) -> Tuple[str, str]:
 
 class Daemon(DaemonThread):
 
+    @profiler
     def __init__(self, config: SimpleConfig, fd=None, *, listen_jsonrpc=True):
         DaemonThread.__init__(self)
         self.config = config
@@ -194,18 +195,18 @@ class Daemon(DaemonThread):
                 response = False
         elif sub == 'status':
             if self.network:
-                p = self.network.get_parameters()
+                net_params = self.network.get_parameters()
                 current_wallet = self.cmd_runner.wallet
                 current_wallet_path = current_wallet.storage.path \
                                       if current_wallet else None
                 response = {
                     'path': self.network.config.path,
-                    'server': p[0],
+                    'server': net_params.host,
                     'blockchain_height': self.network.get_local_height(),
                     'server_height': self.network.get_server_height(),
                     'spv_nodes': len(self.network.get_interfaces()),
                     'connected': self.network.is_connected(),
-                    'auto_connect': p[4],
+                    'auto_connect': net_params.auto_connect,
                     'version': ELECTRUM_VERSION,
                     'wallets': {k: w.is_up_to_date()
                                 for k, w in self.wallets.items()},

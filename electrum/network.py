@@ -116,6 +116,7 @@ class NetworkParameters(NamedTuple):
     protocol: str
     proxy: Optional[dict]
     auto_connect: bool
+    oneserver: bool = False
 
 
 proxy_modes = ['socks4', 'socks5']
@@ -176,7 +177,6 @@ class Network(PrintError):
         if config is None:
             config = {}  # Do not use mutables as default values!
         self.config = SimpleConfig(config) if isinstance(config, dict) else config  # type: SimpleConfig
-        self.num_server = 10 if not self.config.get('oneserver') else 0
         blockchain.blockchains = blockchain.read_blockchains(self.config)
         self.print_error("blockchains", list(blockchain.blockchains))
         self._blockchain_preferred_block = self.config.get('blockchain_preferred_block', None)  # type: Optional[Dict]
@@ -299,7 +299,7 @@ class Network(PrintError):
         lh = self.get_local_height()
         result = (lh - sh) > 1
         if result:
-            self.print_error('%s is lagging (%d vs %d)' % (self.default_server, sh, lh))
+            self.print_error(f'{self.default_server} is lagging ({sh} vs {lh})')
         return result
 
     def _set_status(self, status):
@@ -350,13 +350,15 @@ class Network(PrintError):
             for i in FEE_ETA_TARGETS:
                 fee_tasks.append((i, await group.spawn(session.send_request('blockchain.estimatefee', [i]))))
         self.config.mempool_fees = histogram = histogram_task.result()
-        self.print_error('fee_histogram', histogram)
+        self.print_error(f'fee_histogram {histogram}')
         self.notify('fee_histogram')
-        for i, task in fee_tasks:
+        fee_estimates_eta = {}
+        for nblock_target, task in fee_tasks:
             fee = int(task.result() * COIN)
-            self.print_error("fee_estimates[%d]" % i, fee)
+            fee_estimates_eta[nblock_target] = fee
             if fee < 0: continue
-            self.config.update_fee_estimates(i, fee)
+            self.config.update_fee_estimates(nblock_target, fee)
+        self.print_error(f'fee_estimates {fee_estimates_eta}')
         self.notify('fee')
 
     def get_status_value(self, key):
@@ -386,7 +388,8 @@ class Network(PrintError):
                                  port=port,
                                  protocol=protocol,
                                  proxy=self.proxy,
-                                 auto_connect=self.auto_connect)
+                                 auto_connect=self.auto_connect,
+                                 oneserver=self.oneserver)
 
     def get_donation_address(self):
         if self.is_connected():
@@ -496,16 +499,18 @@ class Network(PrintError):
         except:
             return
         self.config.set_key('auto_connect', net_params.auto_connect, False)
+        self.config.set_key('oneserver', net_params.oneserver, False)
         self.config.set_key('proxy', proxy_str, False)
         self.config.set_key('server', server_str, True)
         # abort if changes were not allowed by config
         if self.config.get('server') != server_str \
-                or self.config.get('proxy') != proxy_str:
+                or self.config.get('proxy') != proxy_str \
+                or self.config.get('oneserver') != net_params.oneserver:
             return
 
         async with self.restart_lock:
             self.auto_connect = net_params.auto_connect
-            if self.proxy != proxy or self.protocol != protocol:
+            if self.proxy != proxy or self.protocol != protocol or self.oneserver != net_params.oneserver:
                 # Restart the network defaulting to the given server
                 await self._stop()
                 self.default_server = server_str
@@ -514,6 +519,10 @@ class Network(PrintError):
                 await self.switch_to_interface(server_str)
             else:
                 await self.switch_lagging_interface()
+
+    def _set_oneserver(self, oneserver: bool):
+        self.num_server = 10 if not oneserver else 0
+        self.oneserver = oneserver
 
     async def _switch_to_random_interface(self):
         '''Switch to a random connected server other than the current one'''
@@ -634,7 +643,7 @@ class Network(PrintError):
             await asyncio.wait_for(interface.ready, timeout)
         except BaseException as e:
             #traceback.print_exc()
-            self.print_error(server, "couldn't launch because", str(e), str(type(e)))
+            self.print_error(f"couldn't launch iface {server} -- {repr(e)}")
             await interface.close()
             return
         else:
@@ -808,6 +817,7 @@ class Network(PrintError):
         self.protocol = deserialize_server(self.default_server)[2]
         self.server_queue = queue.Queue()
         self._set_proxy(deserialize_proxy(self.config.get('proxy')))
+        self._set_oneserver(self.config.get('oneserver'))
         self._start_interface(self.default_server)
 
         async def main():
