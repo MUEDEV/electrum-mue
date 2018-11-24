@@ -4,8 +4,8 @@
 [Desktop Entry]
 Comment=Lightweight NIX Client
 Exec=sh -c "PATH=\"\\$HOME/.local/bin:\\$PATH\"; electrum %u"
-GenericName[en_US]=Bitcoin Wallet
-GenericName=Bitcoin Wallet
+GenericName[en_US]=NIX Wallet
+GenericName=NIX Wallet
 Icon=electrum
 Name[en_US]=Electrum NIX Wallet
 Name=Electrum NIX Wallet
