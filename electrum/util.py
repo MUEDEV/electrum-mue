@@ -60,7 +60,7 @@ base_units = {'NIX':8, 'mNIX':5, 'bits':2, 'sat':0}
 base_units_inverse = inv_dict(base_units)
 base_units_list = ['NIX', 'mNIX', 'bits', 'sat']  # list(dict) does not guarantee order
 
-DECIMAL_POINT_DEFAULT = 5  # mNIX
+DECIMAL_POINT_DEFAULT = 8  # mNIX
 
 
 class UnknownBaseUnit(Exception): pass
