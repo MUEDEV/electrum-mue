@@ -15,6 +15,7 @@ env/
 bin/
 /app.fil
 .idea
+.DS_Store
 
 # icons
 electrum/gui/qt/icons_rc.py
