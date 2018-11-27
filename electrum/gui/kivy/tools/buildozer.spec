@@ -4,7 +4,7 @@
 title = Electrum NIX
 
 # (str) Package name
-package.name = Electrum-NIX
+package.name = ElectrumNIX
 
 # (str) Package domain (needed for android/ios packaging)
 package.domain = io.nixplatform.electrum
