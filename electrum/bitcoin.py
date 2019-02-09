@@ -332,7 +332,7 @@ def public_key_to_p2pk_script(pubkey: str) -> str:
 def address_to_lpos_script(owner: str, merchant: str, cold_merchant: str, fee: float, *, net=None) -> str:
     if net is None:
         net = constants.net
-    if not is_address(owner, net=net) || not is_address(merchant, net=net):
+    if not is_address(owner, net=net) or not is_address(merchant, net=net) or not is_address(cold_merchant, net=net):
         raise BitcoinException(f"invalid nix address: {owner} {merchant}")
     owner_addrtype, hash_160_owner_ = b58_address_to_hash160(owner)
     merchant_addrtype, hash_160_merchant_ = b58_address_to_hash160(merchant)
