@@ -337,7 +337,7 @@ def address_to_lpos_script(owner: str, merchant: str, cold_merchant: str, fee: f
     owner_addrtype, hash_160_owner_ = b58_address_to_hash160(owner)
     merchant_addrtype, hash_160_merchant_ = b58_address_to_hash160(merchant)
     cold_merchant_addrtype, hash_160_cold_merchant_ = b58_address_to_hash160(cold_merchant)
-    If owner_addrtype == net.ADDRTYPE_P2SH and merchant_addrtype == net.ADDRTYPE_P2SH and cold_merchant_addrtype == net.ADDRTYPE_P2SH:
+    if owner_addrtype == net.ADDRTYPE_P2SH and merchant_addrtype == net.ADDRTYPE_P2SH and cold_merchant_addrtype == net.ADDRTYPE_P2SH:
         script = 'b8'					     # op_coinstake
         script += '63'                                        # op_if
 	# ---merchant---
@@ -365,6 +365,8 @@ def address_to_lpos_script(owner: str, merchant: str, cold_merchant: str, fee: f
     return script
 
 def address_to_lpos_scripthash(owner: str, merchant: str, cold_merchant: str, fee: float) -> str:
+    if fee > 10000 or float(fee) < 0:
+        raise BitcoinException(f'improper fee amount')
     script = address_to_lpos_script(owner, merchant, cold_merchant, fee)
     return script_to_scripthash(script)
 

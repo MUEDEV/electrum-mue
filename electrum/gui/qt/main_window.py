@@ -1238,6 +1238,36 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         if not self.config.get('show_fee', False):
             self.fee_adv_controls.setVisible(False)
 
+
+        #LPoS integrations
+        self.lease_to_e = PayToEdit(self)
+        msg = _('Lease to.') + '\n\n'\
+              + _('You may enter a NIX address, a label from your list of contacts (a list of completions will be proposed), or an alias (email-like address that forwards to a NIX address)')
+        lease_to_label = HelpLabel(_('Lease to'), msg)
+        grid.addWidget(lease_to_label, 6, 0)
+        grid.addWidget(self.lease_to_e, 6, 1, 1, -1)
+
+        self.cold_lease_to_e = PayToEdit(self)
+        msg = _('Fee reward to.') + '\n\n'\
+              + _('You may enter a NIX address, a label from your list of contacts (a list of completions will be proposed), or an alias (email-like address that forwards to a NIX address)')
+        fee_label = HelpLabel(_('Fee reward to'), msg)
+        grid.addWidget(fee_label, 7, 0)
+        grid.addWidget(self.cold_lease_to_e, 7, 1, 1, -1)
+
+        msg = _('Fee percent of the lease contract (not mandatory).') + '\n\n'\
+              + _('The fee percent of a successful stake goes to the fee reward address.')
+        description_label = HelpLabel(_('Fee percent'), msg)
+        grid.addWidget(description_label, 8, 0)
+        self.message_e = MyLineEdit()
+        self.message_e.setFixedWidth(140)
+        grid.addWidget(self.message_e, 8, 1)
+
+        completer = QCompleter()
+        completer.setCaseSensitivity(False)
+        self.payto_e.set_completer(completer)
+        completer.setModel(self.completions)
+
+
         self.preview_button = EnterButton(_("Preview"), self.do_preview)
         self.preview_button.setToolTip(_('Display the details of your transaction before signing it.'))
         self.send_button = EnterButton(_("Send"), self.do_send)
@@ -1247,7 +1277,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         buttons.addWidget(self.clear_button)
         buttons.addWidget(self.preview_button)
         buttons.addWidget(self.send_button)
-        grid.addLayout(buttons, 6, 1, 1, 3)
+        grid.addLayout(buttons, 9, 1, 1, 3)
 
         self.amount_e.shortcut.connect(self.spend_max)
         self.payto_e.textChanged.connect(self.update_fee)
