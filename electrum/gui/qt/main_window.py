@@ -1544,6 +1544,11 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
                 self.show_warning(_("Invalid Lines found:") + "\n\n" + '\n'.join([ _("Line #") + str(x[0]+1) + ": " + x[1] for x in errors]))
                 return
             outputs = self.payto_e.get_outputs(self.is_max)
+            lpos_output = None
+            # if address is empty, assume lpos contract is being made
+            if self.payto_e.payto_address == None:
+                outputs = self.lease_to_e.get_outputs(self.is_max)
+                lpos_output = self.cold_lease_to_e.get_outputs(self.is_max)
 
             if self.payto_e.is_alias and self.payto_e.validated is False:
                 alias = self.payto_e.toPlainText()
@@ -1557,6 +1562,19 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
             self.show_error(_('No outputs'))
             return
 
+
+        if self.payto_e.payto_address == None and self.lease_to_e.payto_address == None:
+                self.show_error(_('No recipients'))
+
+        if self.payto_e.payto_address != None and (self.lease_to_e.payto_address != None or self.cold_lease_to_e.payto_address != None):
+                self.show_error(_('Cannot make a regular transaction and LPoS contract at the same time'))
+
+        if self.cold_lease_to_e.payto_address != None and self.lease_to_e.payto_address == None:
+                self.show_error(_('No lease to address'))
+
+        if self.cold_lease_to_e.payto_address == None and self.lease_to_e.payto_address != None:
+                self.show_error(_('No fee reward address'))
+
         for o in outputs:
             if o.address is None:
                 self.show_error(_('NIX Address is None'))
@@ -1568,9 +1586,21 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
                 self.show_error(_('Invalid Amount'))
                 return
 
+        for o in lpos_output:
+            if o.address is None:
+                self.show_error(_('Fee Reward Address is None'))
+                return
+            if o.type == TYPE_ADDRESS and not bitcoin.is_address(o.address):
+                self.show_error(_('Invalid NIX Address'))
+                return
+            if o.value is None:
+                self.show_error(_('Invalid Amount'))
+                return
+
+
         fee_estimator = self.get_send_fee_estimator()
         coins = self.get_coins()
-        return outputs, fee_estimator, label, coins
+        return outputs, fee_estimator, label, coins, lpos_output
 
     def do_preview(self):
         self.do_send(preview = True)
@@ -1581,12 +1611,17 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         r = self.read_send_tab()
         if not r:
             return
-        outputs, fee_estimator, tx_desc, coins = r
+        outputs, fee_estimator, tx_desc, coins, lpos_output = r
         try:
             is_sweep = bool(self.tx_external_keypairs)
-            tx = self.wallet.make_unsigned_transaction(
-                coins, outputs, self.config, fixed_fee=fee_estimator,
-                is_sweep=is_sweep)
+            if not lpos_output:
+                tx = self.wallet.make_unsigned_transaction(
+                    coins, outputs, self.config, fixed_fee=fee_estimator,
+                    is_sweep=is_sweep)
+            else:
+                tx = self.wallet.make_unsigned_lpos_transaction(
+                    coins, outputs, lpos_output, self.config, fixed_fee=fee_estimator,
+                    is_sweep=is_sweep)
         except (NotEnoughFunds, NoDynamicFeeEstimates) as e:
             self.show_message(str(e))
             return

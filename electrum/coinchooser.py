@@ -263,6 +263,82 @@ class CoinChooserBase(PrintError):
 
         return tx
 
+    def make_lpos_tx(self, coins, inputs, outputs, lpos_output, change_addrs, fee_estimator,
+                dust_threshold):
+        """Select unspent coins to spend to pay outputs.  If the change is
+        greater than dust_threshold (after adding the change output to
+        the transaction) it is kept, otherwise none is sent and it is
+        added to the transaction fee.
+
+        Note: fee_estimator expects virtual bytes
+        """
+
+        # Deterministic randomness from coins
+        utxos = [c['prevout_hash'] + str(c['prevout_n']) for c in coins]
+        self.p = PRNG(''.join(sorted(utxos)))
+
+        # Copy the outputs so when adding change we don't modify "outputs"
+        tx = Transaction.from_lpos_io(inputs[:], outputs[:], lpos_output[:])
+        input_value = tx.input_value()
+
+        # Weight of the transaction with no inputs and no change
+        # Note: this will use legacy tx serialization as the need for "segwit"
+        # would be detected from inputs. The only side effect should be that the
+        # marker and flag are excluded, which is compensated in get_tx_weight()
+        # FIXME calculation will be off by this (2 wu) in case of RBF batching
+        base_weight = tx.estimated_weight()
+        spent_amount = tx.output_value()
+
+        def fee_estimator_w(weight):
+            return fee_estimator(Transaction.virtual_size_from_weight(weight))
+
+        def get_tx_weight(buckets):
+            total_weight = base_weight + sum(bucket.weight for bucket in buckets)
+            is_segwit_tx = any(bucket.witness for bucket in buckets)
+            if is_segwit_tx:
+                total_weight += 2  # marker and flag
+                # non-segwit inputs were previously assumed to have
+                # a witness of '' instead of '00' (hex)
+                # note that mixed legacy/segwit buckets are already ok
+                num_legacy_inputs = sum((not bucket.witness) * len(bucket.coins)
+                                        for bucket in buckets)
+                total_weight += num_legacy_inputs
+
+            return total_weight
+
+        def sufficient_funds(buckets):
+            '''Given a list of buckets, return True if it has enough
+            value to pay for the transaction'''
+            total_input = input_value + sum(bucket.value for bucket in buckets)
+            total_weight = get_tx_weight(buckets)
+            return total_input >= spent_amount + fee_estimator_w(total_weight)
+
+        # Collect the coins into buckets, choose a subset of the buckets
+        buckets = self.bucketize_coins(coins)
+        buckets = self.choose_buckets(buckets, sufficient_funds,
+                                      self.penalty_func(tx))
+
+        tx.add_inputs([coin for b in buckets for coin in b.coins])
+        tx_weight = get_tx_weight(buckets)
+
+        # change is sent back to sending address unless specified
+        if not change_addrs:
+            change_addrs = [tx.inputs()[0]['address']]
+            # note: this is not necessarily the final "first input address"
+            # because the inputs had not been sorted at this point
+            assert is_address(change_addrs[0])
+
+        # This takes a count of change outputs and returns a tx fee
+        output_weight = 4 * Transaction.estimated_output_size(change_addrs[0])
+        fee = lambda count: fee_estimator_w(tx_weight + count * output_weight)
+        change = self.change_outputs(tx, change_addrs, fee, dust_threshold)
+        tx.add_outputs(change)
+
+        self.print_error("using %d inputs" % len(tx.inputs()))
+        self.print_error("using buckets:", [bucket.desc for bucket in buckets])
+
+        return tx
+
     def choose_buckets(self, buckets, sufficient_funds, penalty_func):
         raise NotImplemented('To be subclassed')
 
