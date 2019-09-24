@@ -1,4 +1,4 @@
-Electrum - Lightweight NIX client
+Electrum - Lightweight MUE client
 =====================================
 
 ::
