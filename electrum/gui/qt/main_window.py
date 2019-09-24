@@ -410,7 +410,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
             self.setGeometry(100, 100, 840, 400)
 
     def watching_only_changed(self):
-        name = "Electrum NIX Testnet" if constants.net.TESTNET else "Electrum NIX"
+        name = "Electrum MUE Testnet" if constants.net.TESTNET else "Electrum MUE"
         title = '%s %s  -  %s' % (name, ELECTRUM_VERSION,
                                         self.wallet.basename())
         extra = [self.wallet.storage.get('wallet_type', '?')]
@@ -428,8 +428,8 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         if self.wallet.is_watching_only():
             msg = ' '.join([
                 _("This wallet is watching-only."),
-                _("This means you will not be able to spend NIX with it."),
-                _("Make sure you own the seed phrase or the private keys, before you request NIX to be sent to this wallet.")
+                _("This means you will not be able to spend MUE with it."),
+                _("Make sure you own the seed phrase or the private keys, before you request MUE to be sent to this wallet.")
             ])
             self.show_warning(msg, title=_('Information'))
 
@@ -590,28 +590,28 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         d = self.network.get_donation_address()
         if d:
             host = self.network.get_parameters().host
-            self.pay_to_URI('nix:%s?message=donation for %s'%(d, host))
+            self.pay_to_URI('monetaryunit:%s?message=donation for %s'%(d, host))
         else:
             self.show_error(_('No donation address for this server'))
 
     def show_about(self):
         QMessageBox.about(self, "Electrum",
                           (_("Version")+" %s" % ELECTRUM_VERSION + "\n\n" +
-                           _("Electrum's focus is speed, with low resource usage and simplifying NIX.") + " " +
+                           _("Electrum's focus is speed, with low resource usage and simplifying MUE.") + " " +
                            _("You do not need to perform regular backups, because your wallet can be "
                               "recovered from a secret phrase that you can memorize or write on paper.") + " " +
                            _("Startup times are instant because it operates in conjunction with high-performance "
-                              "servers that handle the most complicated parts of the NIX system.") + "\n\n" +
+                              "servers that handle the most complicated parts of the MUE system.") + "\n\n" +
                            _("Uses icons from the Icons8 icon pack (icons8.com).")))
 
     def show_report_bug(self):
         msg = ' '.join([
             _("Please report any bugs as issues on github:<br/>"),
-            "<a href=\"https://github.com/NixPlatform/electrum-nix/issues\">https://github.com/NixPlatform/electrum-nix/issues</a><br/><br/>",
+            "<a href=\"https://github.com/muecoin/electrum-mue/issues\">https://github.com/muecoin/electrum-mue/issues</a><br/><br/>",
             _("Before reporting a bug, upgrade to the most recent version of Electrum (latest release or git HEAD), and include the version number in your report."),
             _("Try to explain not only what the bug is, but how it occurs.")
          ])
-        self.show_message(msg, title="Electrum NIX - " + _("Reporting Bugs"))
+        self.show_message(msg, title="Electrum MUE - " + _("Reporting Bugs"))
 
     def notify_transactions(self):
         if self.tx_notification_queue.qsize() == 0:
@@ -649,9 +649,9 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         if self.tray:
             try:
                 # this requires Qt 5.9
-                self.tray.showMessage("Electrum NIX", message, QIcon(":icons/electrum_dark_icon"), 20000)
+                self.tray.showMessage("Electrum MUE", message, QIcon(":icons/electrum_dark_icon"), 20000)
             except TypeError:
-                self.tray.showMessage("Electrum NIX", message, QSystemTrayIcon.Information, 20000)
+                self.tray.showMessage("Electrum MUE", message, QSystemTrayIcon.Information, 20000)
 
 
 
@@ -834,7 +834,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         self.receive_address_e = ButtonsLineEdit()
         self.receive_address_e.addCopyButton(self.app)
         self.receive_address_e.setReadOnly(True)
-        msg = _('NIX address where the payment should be received. Note that each payment request uses a different NIX address.')
+        msg = _('MUE address where the payment should be received. Note that each payment request uses a different MUE address.')
         self.receive_address_label = HelpLabel(_('Receiving address'), msg)
         self.receive_address_e.textChanged.connect(self.update_receive_qr)
         self.receive_address_e.setFocusPolicy(Qt.ClickFocus)
@@ -864,8 +864,8 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         msg = ' '.join([
             _('Expiration date of your request.'),
             _('This information is seen by the recipient if you send them a signed payment request.'),
-            _('Expired requests have to be deleted manually from your list, in order to free the corresponding NIX addresses.'),
-            _('The NIX address never expires and will always be part of this electrum wallet.'),
+            _('Expired requests have to be deleted manually from your list, in order to free the corresponding MUE addresses.'),
+            _('The MUE address never expires and will always be part of this electrum wallet.'),
         ])
         grid.addWidget(HelpLabel(_('Request expires'), msg), 3, 0)
         grid.addWidget(self.expires_combo, 3, 1)
@@ -1091,7 +1091,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         self.amount_e = BTCAmountEdit(self.get_decimal_point)
         self.payto_e = PayToEdit(self)
         msg = _('Recipient of the funds.') + '\n\n'\
-              + _('You may enter a NIX address, a label from your list of contacts (a list of completions will be proposed), or an alias (email-like address that forwards to a NIX address)')
+              + _('You may enter a MUE address, a label from your list of contacts (a list of completions will be proposed), or an alias (email-like address that forwards to a MUE address)')
         payto_label = HelpLabel(_('Pay to'), msg)
         grid.addWidget(payto_label, 1, 0)
         grid.addWidget(self.payto_e, 1, 1, 1, -1)
@@ -1138,7 +1138,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         hbox.addStretch(1)
         grid.addLayout(hbox, 4, 4)
 
-        msg = _('NIX transactions are in general not free. A transaction fee is paid by the sender of the funds.') + '\n\n'\
+        msg = _('MUE transactions are in general not free. A transaction fee is paid by the sender of the funds.') + '\n\n'\
               + _('The amount of fee can be decided freely by the sender. However, transactions with low fees take more time to be processed.') + '\n\n'\
               + _('A suggested fee is automatically added to this field. You may override it. The suggested fee increases with the size of the transaction.')
         self.fee_e_label = HelpLabel(_('Fee'), msg)
@@ -1239,35 +1239,6 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
             self.fee_adv_controls.setVisible(False)
 
 
-        #LPoS integrations
-        self.lease_to_e = PayToEdit(self)
-        msg = _('Lease to.') + '\n\n'\
-              + _('You may enter a NIX address, a label from your list of contacts (a list of completions will be proposed), or an alias (email-like address that forwards to a NIX address)')
-        lease_to_label = HelpLabel(_('Lease to'), msg)
-        grid.addWidget(lease_to_label, 6, 0)
-        grid.addWidget(self.lease_to_e, 6, 1, 1, -1)
-
-        self.cold_lease_to_e = PayToEdit(self)
-        msg = _('Fee reward to.') + '\n\n'\
-              + _('You may enter a NIX address, a label from your list of contacts (a list of completions will be proposed), or an alias (email-like address that forwards to a NIX address)')
-        fee_label = HelpLabel(_('Fee reward to'), msg)
-        grid.addWidget(fee_label, 7, 0)
-        grid.addWidget(self.cold_lease_to_e, 7, 1, 1, -1)
-
-        msg = _('Fee percent of the lease contract (not mandatory).') + '\n\n'\
-              + _('The fee percent of a successful stake goes to the fee reward address.')
-        description_label = HelpLabel(_('Fee percent'), msg)
-        grid.addWidget(description_label, 8, 0)
-        self.message_e = MyLineEdit()
-        self.message_e.setFixedWidth(140)
-        grid.addWidget(self.message_e, 8, 1)
-
-        completer = QCompleter()
-        completer.setCaseSensitivity(False)
-        self.payto_e.set_completer(completer)
-        completer.setModel(self.completions)
-
-
         self.preview_button = EnterButton(_("Preview"), self.do_preview)
         self.preview_button.setToolTip(_('Display the details of your transaction before signing it.'))
         self.send_button = EnterButton(_("Send"), self.do_send)
@@ -1277,7 +1248,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         buttons.addWidget(self.clear_button)
         buttons.addWidget(self.preview_button)
         buttons.addWidget(self.send_button)
-        grid.addLayout(buttons, 9, 1, 1, 3)
+        grid.addLayout(buttons, 6, 1, 1, 3)
 
         self.amount_e.shortcut.connect(self.spend_max)
         self.payto_e.textChanged.connect(self.update_fee)
@@ -1544,11 +1515,6 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
                 self.show_warning(_("Invalid Lines found:") + "\n\n" + '\n'.join([ _("Line #") + str(x[0]+1) + ": " + x[1] for x in errors]))
                 return
             outputs = self.payto_e.get_outputs(self.is_max)
-            lpos_output = None
-            # if address is empty, assume lpos contract is being made
-            if self.payto_e.payto_address == None:
-                outputs = self.lease_to_e.get_outputs(self.is_max)
-                lpos_output = self.cold_lease_to_e.get_outputs(self.is_max)
 
             if self.payto_e.is_alias and self.payto_e.validated is False:
                 alias = self.payto_e.toPlainText()
@@ -1562,36 +1528,12 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
             self.show_error(_('No outputs'))
             return
 
-
-        if self.payto_e.payto_address == None and self.lease_to_e.payto_address == None:
-                self.show_error(_('No recipients'))
-
-        if self.payto_e.payto_address != None and (self.lease_to_e.payto_address != None or self.cold_lease_to_e.payto_address != None):
-                self.show_error(_('Cannot make a regular transaction and LPoS contract at the same time'))
-
-        if self.cold_lease_to_e.payto_address != None and self.lease_to_e.payto_address == None:
-                self.show_error(_('No lease to address'))
-
-        if self.cold_lease_to_e.payto_address == None and self.lease_to_e.payto_address != None:
-                self.show_error(_('No fee reward address'))
-
         for o in outputs:
             if o.address is None:
-                self.show_error(_('NIX Address is None'))
+                self.show_error(_('MUE Address is None'))
                 return
             if o.type == TYPE_ADDRESS and not bitcoin.is_address(o.address):
-                self.show_error(_('Invalid NIX Address'))
-                return
-            if o.value is None:
-                self.show_error(_('Invalid Amount'))
-                return
-
-        for o in lpos_output:
-            if o.address is None:
-                self.show_error(_('Fee Reward Address is None'))
-                return
-            if o.type == TYPE_ADDRESS and not bitcoin.is_address(o.address):
-                self.show_error(_('Invalid NIX Address'))
+                self.show_error(_('Invalid MUE Address'))
                 return
             if o.value is None:
                 self.show_error(_('Invalid Amount'))
@@ -1600,7 +1542,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
 
         fee_estimator = self.get_send_fee_estimator()
         coins = self.get_coins()
-        return outputs, fee_estimator, label, coins, lpos_output
+        return outputs, fee_estimator, label, coins
 
     def do_preview(self):
         self.do_send(preview = True)
@@ -1611,17 +1553,12 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         r = self.read_send_tab()
         if not r:
             return
-        outputs, fee_estimator, tx_desc, coins, lpos_output = r
+        outputs, fee_estimator, tx_desc, coins = r
         try:
             is_sweep = bool(self.tx_external_keypairs)
-            if not lpos_output:
-                tx = self.wallet.make_unsigned_transaction(
-                    coins, outputs, self.config, fixed_fee=fee_estimator,
-                    is_sweep=is_sweep)
-            else:
-                tx = self.wallet.make_unsigned_lpos_transaction(
-                    coins, outputs, lpos_output, self.config, fixed_fee=fee_estimator,
-                    is_sweep=is_sweep)
+            tx = self.wallet.make_unsigned_transaction(
+                coins, outputs, self.config, fixed_fee=fee_estimator,
+                is_sweep=is_sweep)
         except (NotEnoughFunds, NoDynamicFeeEstimates) as e:
             self.show_message(str(e))
             return
@@ -1821,7 +1758,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         try:
             out = util.parse_URI(URI, self.on_pr)
         except BaseException as e:
-            self.show_error(_('Invalid NIX URI:') + '\n' + str(e))
+            self.show_error(_('Invalid MUE URI:') + '\n' + str(e))
             return
         self.show_send_tab()
         r = out.get('r')
@@ -2285,7 +2222,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         address  = address.text().strip()
         message = message.toPlainText().strip()
         if not bitcoin.is_address(address):
-            self.show_message(_('Invalid NIX address.'))
+            self.show_message(_('Invalid MUE address.'))
             return
         if self.wallet.is_watching_only():
             self.show_message(_('This is a watching-only wallet.'))
@@ -2313,7 +2250,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         address  = address.text().strip()
         message = message.toPlainText().strip().encode('utf-8')
         if not bitcoin.is_address(address):
-            self.show_message(_('Invalid NIX address.'))
+            self.show_message(_('Invalid MUE address.'))
             return
         try:
             # This can throw on invalid base64
@@ -2456,7 +2393,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         if not data:
             return
         # if the user scanned a bitcoin URI
-        if str(data).startswith("nix:"):
+        if str(data).startswith("monetaryunit:"):
             self.pay_to_URI(data)
             return
         # else if the user scanned an offline signed tx
@@ -2532,7 +2469,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         e.setReadOnly(True)
         vbox.addWidget(e)
 
-        defaultname = 'electrum-nix-private-keys.csv'
+        defaultname = 'electrum-mue-private-keys.csv'
         select_msg = _('Select file to export your private keys to')
         hbox, filename_e, csv_button = filename_field(self, self.config, defaultname, select_msg)
         vbox.addLayout(hbox)
@@ -2888,7 +2825,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
 
         units = base_units_list
         msg = (_('Base unit of your wallet.')
-               + '\n1 NIX = 1000 mNIX. 1 mNIX = 1000 bits. 1 bit = 100 sat.\n'
+               + '\n1 MUE = 1000 mMUE. 1 mMUE = 1000 bits. 1 bit = 100 sat.\n'
                + _('This setting affects the Send tab, and all balance related fields.'))
         unit_label = HelpLabel(_('Base unit') + ':', msg)
         unit_combo = QComboBox()
@@ -3158,7 +3095,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
 
         run_hook('close_settings_dialog')
         if self.need_restart:
-            self.show_warning(_('Please restart Electrum NIX to activate the new GUI settings'), title=_('Success'))
+            self.show_warning(_('Please restart Electrum MUE to activate the new GUI settings'), title=_('Success'))
 
 
     def closeEvent(self, event):
