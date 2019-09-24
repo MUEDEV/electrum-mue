@@ -796,15 +796,6 @@ class Transaction:
         return self
 
     @classmethod
-    def from_lpos_io(klass, inputs, outputs, lpos_output, locktime=0):
-        self = klass(None)
-        self._inputs = inputs
-        self._outputs = outputs + lpos_output
-        self.locktime = locktime
-        self.BIP69_sort()
-        return self
-
-    @classmethod
     def pay_script(self, output_type, addr: str) -> str:
         """Returns scriptPubKey in hex form."""
         if output_type == TYPE_SCRIPT:
