@@ -2,18 +2,18 @@
 # sudo desktop-file-install electrum.desktop
 
 [Desktop Entry]
-Comment=Lightweight NIX Client
+Comment=Lightweight MUE Client
 Exec=sh -c "PATH=\"\\$HOME/.local/bin:\\$PATH\"; electrum %u"
-GenericName[en_US]=NIX Wallet
-GenericName=NIX Wallet
+GenericName[en_US]=MUE Wallet
+GenericName=MUE Wallet
 Icon=electrum
-Name[en_US]=Electrum NIX Wallet
-Name=Electrum NIX Wallet
+Name[en_US]=Electrum MUE Wallet
+Name=Electrum MUE Wallet
 Categories=Finance;Network;
 StartupNotify=false
 Terminal=false
 Type=Application
-MimeType=x-scheme-handler/nix;
+MimeType=x-scheme-handler/monetaryunit;
 Actions=Testnet;
 
 [Desktop Action Testnet]
