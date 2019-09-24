@@ -56,18 +56,18 @@ def inv_dict(d):
     return {v: k for k, v in d.items()}
 
 
-base_units = {'NIX':8, 'mNIX':5, 'bits':2, 'sat':0}
+base_units = {'MUE':8, 'mMUE':5, 'bits':2, 'sat':0}
 base_units_inverse = inv_dict(base_units)
-base_units_list = ['NIX', 'mNIX', 'bits', 'sat']  # list(dict) does not guarantee order
+base_units_list = ['MUE', 'mMUE', 'bits', 'sat']  # list(dict) does not guarantee order
 
-DECIMAL_POINT_DEFAULT = 8  # mNIX
+DECIMAL_POINT_DEFAULT = 8  # mMUE
 
 
 class UnknownBaseUnit(Exception): pass
 
 
 def decimal_point_to_base_unit_name(dp: int) -> str:
-    # e.g. 8 -> "NIX"
+    # e.g. 8 -> "MUE"
     try:
         return base_units_inverse[dp]
     except KeyError:
@@ -75,7 +75,7 @@ def decimal_point_to_base_unit_name(dp: int) -> str:
 
 
 def base_unit_name_to_decimal_point(unit_name: str) -> int:
-    # e.g. "NIX" -> 8
+    # e.g. "MUE" -> 8
     try:
         return base_units[unit_name]
     except KeyError:
@@ -141,7 +141,7 @@ class Satoshis(object):
         return 'Satoshis(%d)'%self.value
 
     def __str__(self):
-        return format_satoshis(self.value) + " NIX"
+        return format_satoshis(self.value) + " MUE"
 
 class Fiat(object):
     __slots__ = ('value', 'ccy')
@@ -456,11 +456,11 @@ def user_dir():
     if 'ANDROID_DATA' in os.environ:
         return android_data_dir()
     elif os.name == 'posix':
-        return os.path.join(os.environ["HOME"], ".electrum-nix")
+        return os.path.join(os.environ["HOME"], ".electrum-mue")
     elif "APPDATA" in os.environ:
-        return os.path.join(os.environ["APPDATA"], "Electrum-NIX")
+        return os.path.join(os.environ["APPDATA"], "Electrum-MUE")
     elif "LOCALAPPDATA" in os.environ:
-        return os.path.join(os.environ["LOCALAPPDATA"], "Electrum-NIX")
+        return os.path.join(os.environ["LOCALAPPDATA"], "Electrum-MUE")
     else:
         #raise Exception("No home directory found in environment variables.")
         return
@@ -590,7 +590,7 @@ def time_difference(distance_in_time, include_seconds):
         return "over %d years" % (round(distance_in_minutes / 525600))
 
 mainnet_block_explorers = {
-    'blockchain.nixplatform.io': ('https://blockchain.nixplatform.io/',
+    'blockbook.monetaryunit.org': ('https://blockbook.monetaryunit.org/',
                         {'tx': 'tx/', 'addr': 'address/'}),
     'system default': ('blockchain:/',
                         {'tx': 'tx/', 'addr': 'address/'}),
@@ -636,12 +636,12 @@ def parse_URI(uri: str, on_pr: Callable=None) -> dict:
 
     if ':' not in uri:
         if not bitcoin.is_address(uri):
-            raise Exception("Not a nix address")
+            raise Exception("Not a MUE address")
         return {'address': uri}
 
     u = urllib.parse.urlparse(uri)
-    if u.scheme != 'nix':
-        raise Exception("Not a nix URI")
+    if u.scheme != 'monetaryunit':
+        raise Exception("Not a MUE URI")
     address = u.path
 
     # python for android fails to parse query
@@ -658,7 +658,7 @@ def parse_URI(uri: str, on_pr: Callable=None) -> dict:
     out = {k: v[0] for k, v in pq.items()}
     if address:
         if not bitcoin.is_address(address):
-            raise Exception("Invalid nix address:" + address)
+            raise Exception("Invalid MUE address:" + address)
         out['address'] = address
     if 'amount' in out:
         am = out['amount']
@@ -707,7 +707,7 @@ def create_URI(addr, amount, message):
         query.append('amount=%s'%format_satoshis_plain(amount))
     if message:
         query.append('message=%s'%urllib.parse.quote(message))
-    p = urllib.parse.ParseResult(scheme='nix', netloc='', path=addr, params='', query='&'.join(query), fragment='')
+    p = urllib.parse.ParseResult(scheme='monetaryunit', netloc='', path=addr, params='', query='&'.join(query), fragment='')
     return urllib.parse.urlunparse(p)
 
 
