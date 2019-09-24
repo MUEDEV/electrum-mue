@@ -23,12 +23,12 @@ string = string.replace("##VERSION_ANDROID##", version_android)
 string = string.replace("##VERSION_APK##", APK_VERSION)
 
 files = {
-    'tgz': "Electrum-nix-%s.tar.gz" % version,
-    'zip': "Electrum-nix-%s.zip" % version,
-    'mac': "electrum-nix-%s.dmg" % version_mac,
-    'win': "electrum-nix-%s.exe" % version_win,
-    'win_setup': "electrum-nix-%s-setup.exe" % version_win,
-    'win_portable': "electrum-nix-%s-portable.exe" % version_win,
+    'tgz': "Electrum-mue-%s.tar.gz" % version,
+    'zip': "Electrum-mue-%s.zip" % version,
+    'mac': "electrum-mue-%s.dmg" % version_mac,
+    'win': "electrum-mue-%s.exe" % version_win,
+    'win_setup': "electrum-mue-%s-setup.exe" % version_win,
+    'win_portable': "electrum-mue-%s-portable.exe" % version_win,
 }
 
 for k, n in files.items():
