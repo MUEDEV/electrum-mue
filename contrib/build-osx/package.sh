@@ -17,7 +17,7 @@ export PATH=$PATH:~/bin
 . $(dirname "$0")/base.sh
 
 if [ -z "$1" ]; then
-    echo "Usage: $0 Electrum-NIX.app"
+    echo "Usage: $0 Electrum-MUE.app"
     exit -127
 fi
 
@@ -73,7 +73,7 @@ ${genisoimage} \
     -D \
     -l \
     -probe \
-    -V "Electrum-NIX" \
+    -V "Electrum-MUE" \
     -no-pad \
     -r \
     -dir-mode 0755 \
@@ -81,8 +81,8 @@ ${genisoimage} \
     -o Electrum_uncompressed.dmg \
     /tmp/electrum-macos/image || fail "Unable to create uncompressed dmg"
 
-dmg dmg Electrum_uncompressed.dmg electrum-nix-$VERSION.dmg || fail "Unable to create compressed dmg"
+dmg dmg Electrum_uncompressed.dmg electrum-mue-$VERSION.dmg || fail "Unable to create compressed dmg"
 rm Electrum_uncompressed.dmg
 
 echo "Done."
-md5sum electrum-nix-$VERSION.dmg
+md5sum electrum-mue-$VERSION.dmg
