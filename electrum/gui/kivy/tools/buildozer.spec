@@ -1,13 +1,13 @@
 [app]
 
 # (str) Title of your application
-title = Electrum NIX
+title = Electrum MUE
 
 # (str) Package name
-package.name = ElectrumNIX
+package.name = ElectrumMUE
 
 # (str) Package domain (needed for android/ios packaging)
-package.domain = io.nixplatform.electrum
+package.domain = org.monetaryunit.electrum
 
 # (str) Source code where the main.py live
 source.dir = .
@@ -105,7 +105,7 @@ android.add_activities = org.electrum.qr.SimpleScannerActivity
 #android.ouya.icon.filename = %(source.dir)s/data/ouya_icon.png
 
 # (str) XML file to include as an intent filters in <activity> tag
-android.manifest.intent_filters = electrum/gui/kivy/tools/nix_intent.xml
+android.manifest.intent_filters = electrum/gui/kivy/tools/mue_intent.xml
 
 # (str) launchMode to set for the main activity
 android.manifest.launch_mode = singleTask
