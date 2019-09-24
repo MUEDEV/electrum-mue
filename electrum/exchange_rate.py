@@ -387,7 +387,7 @@ class Zaif(ExchangeBase):
 
 class Coingecko(ExchangeBase):
     async def get_rates(self, ccy):
-        json = await self.get_json('api.coingecko.com', '/api/v3/coins/nix-platform?tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false')
+        json = await self.get_json('api.coingecko.com', '/api/v3/coins/monetaryunit?tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false')
         return {'EUR': Decimal(json['market_data']['current_price']['eur']),
                 'USD': Decimal(json['market_data']['current_price']['usd']),
                 'RUB': Decimal(json['market_data']['current_price']['rub']),
