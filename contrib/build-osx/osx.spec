@@ -5,7 +5,7 @@ from PyInstaller.utils.hooks import collect_data_files, collect_submodules, coll
 import sys
 import os
 
-PACKAGE='Electrum-NIX'
+PACKAGE='Electrum-MUE'
 PYPKG='electrum'
 MAIN_SCRIPT='run_electrum'
 ICONS_FILE='electrum.icns'
