@@ -43,42 +43,42 @@ class AbstractNet:
     def max_checkpoint(cls) -> int:
         return max(0, len(cls.CHECKPOINTS) * 2016 - 1)
 
-class NixMainnet(AbstractNet):
+class MueMainnet(AbstractNet):
 
     TESTNET = False
-    WIF_PREFIX = 0x80
-    ADDRTYPE_P2PKH = 38
-    ADDRTYPE_P2SH = 53
-    SEGWIT_HRP = "nix"
-    GENESIS = "dd28ad86def767c3cfc34267a950d871fc7462bc57ea4a929fc3596d9b598e41"
+    WIF_PREFIX = 0x7E
+    ADDRTYPE_P2PKH = 16
+    ADDRTYPE_P2SH = 76
+    SEGWIT_HRP = "mu"
+    GENESIS = "0b58ed450b3819ca54ab0054c4d220ca4f887d21c9e55d2a333173adf76d987f"
     DEFAULT_PORTS = {'t': '50001', 's': '50002'}
     DEFAULT_SERVERS = read_json('servers.json', {})
     CHECKPOINTS = read_json('checkpoints.json', [])
 
     XPRV_HEADERS = {
-        'standard': 0x0488ade4,  # xprv
+        'standard': 0x0221312b,  # xprv
         'p2wpkh-p2sh': 0x049d7878,  # yprv
         'p2wsh-p2sh': 0x0295b005,  # Yprv
         'p2wpkh': 0x04b2430c,  # zprv
         'p2wsh': 0x02aa7a99,  # Zprv
     }
     XPUB_HEADERS = {
-        'standard': 0x0488b21e,  # xpub
+        'standard': 0x022d2533,  # xpub
         'p2wpkh-p2sh': 0x049d7cb2,  # ypub
         'p2wsh-p2sh': 0x0295b43f,  # Ypub
         'p2wpkh': 0x04b24746,  # zpub
         'p2wsh': 0x02aa7ed3,  # Zpub
     }
-    BIP44_COIN_TYPE = 400
+    BIP44_COIN_TYPE = 31
 
-class NixTestnet(AbstractNet):
+class MueTestnet(AbstractNet):
 
     TESTNET = True
     WIF_PREFIX = 0x80
     ADDRTYPE_P2PKH = 0
     ADDRTYPE_P2SH = 5
-    SEGWIT_HRP = "tnix"
-    GENESIS = "dd28ad86def767c3cfc34267a950d871fc7462bc57ea4a929fc3596d9b598e41"
+    SEGWIT_HRP = "tmue"
+    GENESIS = "613e35c5b607586d3f5b8b109d162eac5fca0be0b0fa282277092e8dea8af138"
     DEFAULT_PORTS = {'t': '51001', 's': '51002'}
     DEFAULT_SERVERS = read_json('servers_testnet.json', {})
     CHECKPOINTS = read_json('checkpoints_testnet.json', [])
@@ -97,7 +97,7 @@ class NixTestnet(AbstractNet):
         'p2wpkh':      0x045f1cf6,  # vpub
         'p2wsh':       0x02575483,  # Vpub
     }
-    BIP44_COIN_TYPE = 400
+    BIP44_COIN_TYPE = 31
 
 class BitcoinMainnet(AbstractNet):
 
@@ -174,7 +174,7 @@ class BitcoinSimnet(BitcoinTestnet):
 
 
 # don't import net directly, import the module instead (so that net is singleton)
-net = NixMainnet
+net = MueMainnet
 
 def set_simnet():
     global net
@@ -182,7 +182,7 @@ def set_simnet():
 
 def set_mainnet():
     global net
-    net = NixMainnet
+    net = MueMainnet
 
 
 def set_testnet():
