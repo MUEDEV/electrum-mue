@@ -1,11 +1,11 @@
 {
-    "ldn.electrum.nixplatform.io": {
+    "electrum1.monetaryunit.org": {
         "pruning": "-",
         "s": "50002",
         "t": "50001",
         "version": "1.4"
     },
-    "electrum.netabuse.net": {
+    "electrum2.monetaryunit.org": {
         "pruning": "-",
         "s": "50002",
         "t": "50001",
