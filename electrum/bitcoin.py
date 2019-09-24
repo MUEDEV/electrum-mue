@@ -39,15 +39,14 @@ if TYPE_CHECKING:
 
 ################################## transactions
 
-COINBASE_MATURITY = 200
+COINBASE_MATURITY = 100
 COIN = 100000000
-TOTAL_COIN_SUPPLY_LIMIT_IN_BTC = 102500000
+TOTAL_COIN_SUPPLY_LIMIT_IN_BTC = 21000000
 
 # supported types of transaction outputs
 TYPE_ADDRESS = 0
 TYPE_PUBKEY  = 1
 TYPE_SCRIPT  = 2
-TYPE_LPOS_FULL  = 3
 
 
 def rev_hex(s: str) -> str:
@@ -328,47 +327,6 @@ def public_key_to_p2pk_script(pubkey: str) -> str:
     script = push_script(pubkey)
     script += 'ac'                                           # op_checksig
     return script
-
-def address_to_lpos_script(owner: str, merchant: str, cold_merchant: str, fee: float, *, net=None) -> str:
-    if net is None:
-        net = constants.net
-    if not is_address(owner, net=net) or not is_address(merchant, net=net) or not is_address(cold_merchant, net=net):
-        raise BitcoinException(f"invalid nix address: {owner} {merchant}")
-    owner_addrtype, hash_160_owner_ = b58_address_to_hash160(owner)
-    merchant_addrtype, hash_160_merchant_ = b58_address_to_hash160(merchant)
-    cold_merchant_addrtype, hash_160_cold_merchant_ = b58_address_to_hash160(cold_merchant)
-    if owner_addrtype == net.ADDRTYPE_P2SH and merchant_addrtype == net.ADDRTYPE_P2SH and cold_merchant_addrtype == net.ADDRTYPE_P2SH:
-        script = 'b8'					     # op_coinstake
-        script += '63'                                        # op_if
-	# ---merchant---
-        script += 'a9'                                        # op_hash_160
-        script += push_script(bh2u(hash_160_merchant_))
-        script += '87'                                       # op_equal
-        script += '67'                                        # op_else
-	# ---owner---
-        script += 'a9'                                        # op_hash_160
-        script += push_script(bh2u(hash_160_owner_))
-        script += '87'                                       # op_equal
-        script += '68'                                        # op_endif
-	# ---fee---
-        
-        script += str(fee * float(100))                       # fee
-        script += '75'                                        # op_drop
-	# ---cold-merchant---
-        script += 'a9'                                        # op_hash_160
-        script += push_script(bh2u(hash_160_cold_merchant_))
-        script += '87'                                       # op_equal
-
-        script += '75'                                        # op_drop
-    else:
-        raise BitcoinException(f'unknown address type: {addrtype}')
-    return script
-
-def address_to_lpos_scripthash(owner: str, merchant: str, cold_merchant: str, fee: float) -> str:
-    if fee > 10000 or float(fee) < 0:
-        raise BitcoinException(f'improper fee amount')
-    script = address_to_lpos_script(owner, merchant, cold_merchant, fee)
-    return script_to_scripthash(script)
 
 __b58chars = b'123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 assert len(__b58chars) == 58
